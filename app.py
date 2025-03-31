@@ -73,10 +73,10 @@ input_text=st.text_input("What question you have in mind?")
 ## HuggingFace model
 try:
     llm = HuggingFaceHub(
-        repo_id="google/flan-t5-base",  # Changed to a smaller model
+        repo_id="google/flan-t5-small",  # or
         model_kwargs={
             "temperature": 0.7,
-            "max_length": 256,  # Reduced max length
+            "max_length": 128,  # Reduced max length
             "device_map": "auto",  # Automatically handle device placement
             "load_in_8bit": True  # Use 8-bit quantization for memory efficiency
         },
