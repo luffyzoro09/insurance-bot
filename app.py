@@ -73,15 +73,31 @@ input_text=st.text_input("What question you have in mind?")
 ## HuggingFace model
 try:
     llm = HuggingFaceHub(
-        repo_id="google/flan-t5-xxl",
-        model_kwargs={"temperature": 0.7, "max_length": 512},
+        repo_id="google/flan-t5-base",  # Changed to a smaller model
+        model_kwargs={
+            "temperature": 0.7,
+            "max_length": 256,  # Reduced max length
+            "device_map": "auto",  # Automatically handle device placement
+            "load_in_8bit": True  # Use 8-bit quantization for memory efficiency
+        },
         huggingfacehub_api_token=huggingface_api_key
     )
     output_parser=StrOutputParser()
     chain=prompt|llm|output_parser
 
     if input_text:
-        st.write(chain.invoke({"question":input_text}))
+        with st.spinner('Thinking...'):
+            response = chain.invoke({"question":input_text})
+            st.write(response)
 except Exception as e:
     st.error(f"Error initializing the model: {str(e)}")
+    st.info("""
+    If you're still seeing memory errors, try these alternatives:
+    1. Use a different model:
+       - "google/flan-t5-small"
+       - "facebook/opt-125m"
+       - "distilgpt2"
+    2. Reduce the max_length parameter
+    3. Use a different HuggingFace inference endpoint
+    """)
 
