@@ -73,14 +73,15 @@ input_text=st.text_input("What question you have in mind?")
 ## HuggingFace model
 try:
     llm = HuggingFaceHub(
-        repo_id="google/flan-t5-small",  # or
+        repo_id="google/flan-t5-small",
+        task="text2text-generation",
         model_kwargs={
             "temperature": 0.7,
-            "max_length": 128,  # Reduced max length
-            "device_map": "auto",  # Automatically handle device placement
-            "load_in_8bit": True  # Use 8-bit quantization for memory efficiency
+            "max_length": 128,
+            "repetition_penalty": 1.2
         },
-        huggingfacehub_api_token=huggingface_api_key
+        huggingfacehub_api_token=huggingface_api_key,
+        client_options={"timeout": 60}  # Increase timeout for inference API
     )
     output_parser=StrOutputParser()
     chain=prompt|llm|output_parser
@@ -92,12 +93,12 @@ try:
 except Exception as e:
     st.error(f"Error initializing the model: {str(e)}")
     st.info("""
-    If you're still seeing memory errors, try these alternatives:
+    If you're still seeing errors, try these alternatives:
     1. Use a different model:
-       - "google/flan-t5-small"
        - "facebook/opt-125m"
        - "distilgpt2"
-    2. Reduce the max_length parameter
-    3. Use a different HuggingFace inference endpoint
+       - "gpt2"
+    2. Try using the OpenAI API instead
+    3. Try using a different HuggingFace endpoint
     """)
 
